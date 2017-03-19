@@ -23,12 +23,18 @@ using ChrsUtils.ChrsPrefabManager;
 public class PlayerControls : MonoBehaviour 
 {
 	//	Public Variabels
-	public float moveSpeed = 1.0f;					//	Default movement speed of character
+	public float moveSpeed = 10.0f;					//	Default movement speed of character
+	public float leftLimit = -12.4f;
+	public float rightLimit = 16.2f;
+	public KeyCode shakeScreen = KeyCode.Space;
 
 	//	Private Variables
+	private SpriteRenderer _MyRenderer;
 	private Rigidbody2D _Rigidbody2D;				//	Reference to player's rigidbody
+	private TrailRenderer _MyTrail;
 	private GameObject _ArcTriangle;					//	Shows were the player is aiming
 	private Transform _Muzzle;						//	Where the bullets spawn from
+	private Particle _ThisParticle;
 
 	private const string ENEMY_WAVE_DESTROYED = "EnemyWaveDestroyed";
 
@@ -40,6 +46,9 @@ public class PlayerControls : MonoBehaviour
 	private void Start () 
 	{
 		_Rigidbody2D = GetComponent<Rigidbody2D> ();
+		_ThisParticle = GetComponent<Particle>();
+		_MyRenderer = GetComponent<SpriteRenderer>();
+		_MyTrail = GetComponent<TrailRenderer>();
 		//_ArcTriangle = GameObject.FindGameObjectWithTag ("Reticle");
 		//_Muzzle = GameObject.FindGameObjectWithTag ("Muzzle").transform;
 		
@@ -63,27 +72,52 @@ public class PlayerControls : MonoBehaviour
 	private void Move (float dx, float dy)
 	{
 		_Rigidbody2D.velocity = new Vector2 (dx * moveSpeed, dy * moveSpeed);
+
+		if (transform.position.x < leftLimit)
+		{
+			transform.position = new Vector3(leftLimit, transform.position.y, transform.position.z);
+		}
+
+		if (transform.position.x > rightLimit)
+		{
+			transform.position = new Vector3(rightLimit, transform.position.y, transform.position.z);
+		}
 	}
 
 	/*--------------------------------------------------------------------------------------*/
 	/*																						*/
-	/*	Shoot: Tells Basic Bullet class to get active										*/
+	/*	ReversePolarity: Tells Basic Bullet class to get active								*/
 	/*																						*/
 	/*--------------------------------------------------------------------------------------*/
-	private void Shoot ()
+	private void ReversePolarity ()
 	{
-		//	Shakes camera when 
-		CameraShake.CameraShakeEffect.Shake(0.1f, 0.25f);
+		StartCoroutine(NormalizePolarity());
+	}
 
-		//	Creates a new bullet from prefab using the position of the muzzle and rotation of the reticle
-		//GameObject bullet = (GameObject)Instantiate (PrefabManager.Instance.bulletPrefab, _Muzzle.position, _Reticle.transform.rotation);
+	IEnumerator NormalizePolarity()
+	{
+		_ThisParticle.charge = _ThisParticle.charge * -1.0f;
+		_MyRenderer.color = _ThisParticle.nodeDischarged;
+		_MyTrail.startColor = _ThisParticle.nodeDischarged;
+		_MyTrail.endColor = _ThisParticle.nodeDischarged;
+		yield return new WaitForSeconds(0.25f);
+		_MyRenderer.color = Color.white;
+		_MyTrail.startColor = Color.white;
+		_MyTrail.endColor = Color.white;
+		_ThisParticle.charge = _ThisParticle.charge * -1.0f;
+	}
 
-		//	Adjusts the trajectory of bullet shot to account for unity's coordinates system
-		//Transform adjustBullettrajectory = _Reticle.transform;
-		//	Rotates
-		//adjustBullettrajectory.Rotate (0.0f, 0.0f, 90.0f);
-		//float theta = adjustBullettrajectory.rotation.eulerAngles.z;
-
+	/// <summary>
+	/// Sent when an incoming collider makes contact with this object's
+	/// collider (2D physics only).
+	/// </summary>
+	/// <param name="other">The Collision2D data associated with this collision.</param>
+	void OnCollisionEnter2D(Collision2D other)
+	{
+		if (other.gameObject.tag == "MovingParticle")
+		{
+			Debug.Log("Hit");
+		}
 	}
 	
 	/*--------------------------------------------------------------------------------------*/
@@ -101,9 +135,9 @@ public class PlayerControls : MonoBehaviour
 		Move (x, y);
 
 		//	If Left or Right mouse button clicked, shoot
-		if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+		if (Input.GetKeyDown(shakeScreen))
 		{
-			Shoot ();
+			ReversePolarity ();
 		}
 
 	}

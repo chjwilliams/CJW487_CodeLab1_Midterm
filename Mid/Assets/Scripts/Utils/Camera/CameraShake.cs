@@ -89,7 +89,7 @@ namespace ChrsUtils
 			void StopShake()
 			{
 				CancelInvoke ("DoShake");
-				mainCamera.transform.localPosition = new Vector3(target.transform.position.x, target.transform.position.y, -10);
+				mainCamera.transform.localPosition = new Vector3(mainCamera.transform.localPosition.x, mainCamera.transform.localPosition.y, -10);
 
 			}		
 		}
