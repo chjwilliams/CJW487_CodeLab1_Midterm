@@ -20,7 +20,7 @@ public class ShakeLevel : MonoBehaviour
 	/// <param name="other">The other Collider2D involved in this collision.</param>
 	void OnTriggerEnter2D(Collider2D other)
 	{
-		if (other.tag == PLAYER)
+		if (other.tag.Contains(PLAYER))
 		{
 			CameraShake.CameraShakeEffect.Shake(0.1f, 0.25f);
 		}

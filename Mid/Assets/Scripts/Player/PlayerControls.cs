@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using ChrsUtils.ChrsCamera;
-using ChrsUtils.ChrsPrefabManager;
 
 /*--------------------------------------------------------------------------------------*/
 /*																						*/
@@ -17,26 +15,30 @@ using ChrsUtils.ChrsPrefabManager;
 /*						void Update ()													*/
 /*																						*/
 /*--------------------------------------------------------------------------------------*/
-
-
-
 public class PlayerControls : MonoBehaviour 
 {
+	public const string PLAYER1 = "Player1";
+	public const string PLAYER2 = "Player2";
+
 	//	Public Variabels
 	public float moveSpeed = 10.0f;					//	Default movement speed of character
 	public float leftLimit = -12.4f;
 	public float rightLimit = 16.2f;
-	public KeyCode shakeScreen = KeyCode.Space;
+	public float lowerLimit = -2.455001f;
+	public float upperLimit = 13.39f;
+	public KeyCode reversePolarity = KeyCode.Space;
+	public KeyCode upKey = KeyCode.W;
+	public KeyCode downKey = KeyCode.S;
+	public KeyCode leftKey = KeyCode.A;
+	public KeyCode rightKey = KeyCode.D;
 
 	//	Private Variables
+	private float x = 0;
+	private float y = 0;
 	private SpriteRenderer _MyRenderer;
 	private Rigidbody2D _Rigidbody2D;				//	Reference to player's rigidbody
 	private TrailRenderer _MyTrail;
-	private GameObject _ArcTriangle;					//	Shows were the player is aiming
-	private Transform _Muzzle;						//	Where the bullets spawn from
 	private Particle _ThisParticle;
-
-	private const string ENEMY_WAVE_DESTROYED = "EnemyWaveDestroyed";
 
 	/*--------------------------------------------------------------------------------------*/
 	/*																						*/
@@ -54,13 +56,6 @@ public class PlayerControls : MonoBehaviour
 		
 	}
 
-	protected virtual void OnPlayerIsDead()
-	{
-
-	}
-
-
-
 	/*--------------------------------------------------------------------------------------*/
 	/*																						*/
 	/*	Move: moves the player in a direction x and/or y based on axis input				*/
@@ -69,9 +64,12 @@ public class PlayerControls : MonoBehaviour
 	/*			float dy - vertical axis input												*/
 	/*																						*/
 	/*--------------------------------------------------------------------------------------*/
-	private void Move (float dx, float dy)
+	private void Move (KeyCode key,float dx, float dy)
 	{
-		_Rigidbody2D.velocity = new Vector2 (dx * moveSpeed, dy * moveSpeed);
+		if(Input.GetKey(key))
+		{
+			_Rigidbody2D.velocity = new Vector2(x * moveSpeed, dy * moveSpeed);
+		}
 
 		if (transform.position.x < leftLimit)
 		{
@@ -81,6 +79,16 @@ public class PlayerControls : MonoBehaviour
 		if (transform.position.x > rightLimit)
 		{
 			transform.position = new Vector3(rightLimit, transform.position.y, transform.position.z);
+		}
+
+		if (transform.position.y > upperLimit)
+		{
+			transform.position = new Vector3(transform.position.x, upperLimit, transform.position.z);
+		}
+
+		if (transform.position.y < lowerLimit)
+		{
+			transform.position = new Vector3(transform.position.x, lowerLimit, transform.position.z);
 		}
 	}
 
@@ -101,9 +109,9 @@ public class PlayerControls : MonoBehaviour
 		_MyTrail.startColor = _ThisParticle.nodeDischarged;
 		_MyTrail.endColor = _ThisParticle.nodeDischarged;
 		yield return new WaitForSeconds(0.25f);
-		_MyRenderer.color = Color.white;
-		_MyTrail.startColor = Color.white;
-		_MyTrail.endColor = Color.white;
+		_MyRenderer.color = _ThisParticle.nodeCharged;
+		_MyTrail.startColor = _ThisParticle.nodeCharged;
+		_MyTrail.endColor = _ThisParticle.nodeCharged;
 		_ThisParticle.charge = _ThisParticle.charge * -1.0f;
 	}
 
@@ -116,7 +124,7 @@ public class PlayerControls : MonoBehaviour
 	{
 		if (other.gameObject.tag == "MovingParticle")
 		{
-			Debug.Log("Hit");
+			
 		}
 	}
 	
@@ -127,18 +135,28 @@ public class PlayerControls : MonoBehaviour
 	/*--------------------------------------------------------------------------------------*/
 	private void Update () 
 	{
-		//	Take in a float value from Input axes
-		float x = Input.GetAxis ("Horizontal");
-		float y = Input.GetAxis ("Vertical");
+		switch(gameObject.tag)
+		{
+			case PLAYER1:
+				x = Input.GetAxis ("Horizontal");
+				y = Input.GetAxis ("Vertical");
+				break;
+			case PLAYER2:
+				x = Input.GetAxis ("Player2_Horizontal");
+				y = Input.GetAxis ("Player2_Vertical");
+				break;
+		}		
 
 		//	Apply the values in here.
-		Move (x, y);
+		Move (upKey, x, y);
+		Move (downKey, x, y);
+		Move (leftKey, x, y);
+		Move (rightKey, x ,y);
 
 		//	If Left or Right mouse button clicked, shoot
-		if (Input.GetKeyDown(shakeScreen))
+		if (Input.GetKeyDown(reversePolarity))
 		{
 			ReversePolarity ();
 		}
-
 	}
 }

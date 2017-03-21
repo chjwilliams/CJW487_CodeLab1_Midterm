@@ -21,6 +21,12 @@ namespace ChrsUtils
 		public class CameraShake : MonoBehaviour 
 		{
 			public static CameraShake CameraShakeEffect;
+			private Vector3 endShakePosition = Vector3.zero;
+			public Vector3 EndShakePosition
+			{
+				get { return endShakePosition;}
+				set { endShakePosition = value;}
+			}
 
 			//	Public Variables
 			public Camera mainCamera; 						//	Refernce to Main camera
@@ -89,7 +95,7 @@ namespace ChrsUtils
 			void StopShake()
 			{
 				CancelInvoke ("DoShake");
-				mainCamera.transform.localPosition = new Vector3(mainCamera.transform.localPosition.x, mainCamera.transform.localPosition.y, -10);
+				mainCamera.transform.localPosition = new Vector3(EndShakePosition.x, EndShakePosition.y, EndShakePosition.z);
 
 			}		
 		}

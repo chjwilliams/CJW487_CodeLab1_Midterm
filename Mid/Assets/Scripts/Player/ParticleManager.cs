@@ -6,14 +6,11 @@ public class ParticleManager : MonoBehaviour
 {
 	public float cycleInterval = 0.007f;					//	increase to make force greater
 
-	public GameObject node;
-
 	private List<Particle> particles;
 	private List<MovingParticle> movingParticles;
 	// Use this for initialization
 	void Start () 
 	{
-		node = GameObject.FindGameObjectWithTag("Player");
 		particles = new List<Particle>(FindObjectsOfType<Particle>());
 		movingParticles = new List<MovingParticle>(FindObjectsOfType<MovingParticle>());
 
@@ -50,7 +47,7 @@ public class ParticleManager : MonoBehaviour
 			}
 
 			float distance = Vector3.Distance(particle.transform.position, thisParticle.gameObject.transform.position);
-			float force = 1000 * particle.charge *  thisParticle.charge / Mathf.Pow(distance, 2);
+			float force = 200 * particle.charge *  thisParticle.charge / Mathf.Pow(distance, 2);
 
 			Vector3 direction = particle.transform.position - thisParticle.transform.position;
 			direction.Normalize();
@@ -65,10 +62,5 @@ public class ParticleManager : MonoBehaviour
 
 			particle.myRigidbody.AddForce(newFocrce);
 		}
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 }
