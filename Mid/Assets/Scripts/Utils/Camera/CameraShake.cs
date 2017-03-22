@@ -20,19 +20,19 @@ namespace ChrsUtils
 		/*--------------------------------------------------------------------------------------*/
 		public class CameraShake : MonoBehaviour 
 		{
-			public static CameraShake CameraShakeEffect;
-			private Vector3 endShakePosition = Vector3.zero;
-			public Vector3 EndShakePosition
+			public static CameraShake CameraShakeEffect;				//	Instance of the CameraShakeEffect
+			private Vector3 endShakePosition = Vector3.zero;			//	Where the camera ends up after the shake
+			public Vector3 EndShakePosition							
 			{
 				get { return endShakePosition;}
 				set { endShakePosition = value;}
 			}
 
 			//	Public Variables
-			public Camera mainCamera; 						//	Refernce to Main camera
-			public GameObject target;						//	Reference to target
-			public const string TAG_TARGET = "Player";		//	Target Taget
-			public float shakeAmount = 0;					//	How violent the shake is
+			public Camera mainCamera; 									//	Refernce to Main camera
+			public GameObject target;									//	Reference to target
+			public const string TAG_TARGET = "Player";					//	Target Taget
+			public float shakeAmount = 0;								//	How violent the shake is
 
 			/*--------------------------------------------------------------------------------------*/
 			/*																						*/

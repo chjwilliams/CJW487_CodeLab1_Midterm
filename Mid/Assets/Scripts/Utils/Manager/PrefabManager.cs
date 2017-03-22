@@ -9,6 +9,9 @@ namespace ChrsUtils
 		/*--------------------------------------------------------------------------------------*/
 		/*																						*/
 		/*	PrefabManager: Manages prefabs when they are destroyed								*/
+		/*			public:																		*/
+        /*																						*/
+		/*			private:																	*/
 		/*																						*/
 		/*--------------------------------------------------------------------------------------*/
 		public class PrefabManager : MonoBehaviour 

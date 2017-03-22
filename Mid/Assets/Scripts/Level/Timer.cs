@@ -6,14 +6,35 @@ using ChrsUtils.ChrsEventSystem.GameEvents;
 using ChrsUtils.ChrsEventSystem.EventsManager;
 using IonGameEvents;
 
+/*--------------------------------------------------------------------------------------*/
+/*																						*/
+/*	Timer: Updates the Timer and displays it on the Canvas                              */
+/*																						*/
+/*		Functions:																		*/
+/*			private:																	*/
+/*			    void Start ()                           								*/
+/*			    void OnStartTimerEvent(GameEvent e)										*/
+/*				void OnDestroy()														*/
+/*																						*/
+/*			public:																		*/
+/*			    void AddDurationInSeconds(float t)										*/
+/*				IEnumerator DecrementTimer()											*/
+/*				string FloatToTime (float toConvert, string format)						*/
+/*																						*/
+/*--------------------------------------------------------------------------------------*/
 public class Timer : MonoBehaviour 
 {
-	private const float MIN_TIME = 0.0f;
-	private float duration;
-	private Text currentTime;
-	private StartTimerEvent.Handler onStartTimerEvent;
+    //  Private Variables
+	private float duration;                                 //  Current Time
+	private Text currentTime;                               //  UI reference to current timer
+	private StartTimerEvent.Handler onStartTimerEvent;      //  Handler for OnStartTimerEvent
 
-	// Use this for initialization
+
+	/*--------------------------------------------------------------------------------------*/
+	/*																						*/
+	/*	Start: Runs once at the begining of the game. Initalizes variables.					*/
+	/*																						*/
+	/*--------------------------------------------------------------------------------------*/
 	void Start () 
 	{
 		currentTime = GetComponent<Text>();
@@ -21,17 +42,47 @@ public class Timer : MonoBehaviour
 		GameEventsManager.Instance.Register<StartTimerEvent>(onStartTimerEvent);
 	}
 
-	void OnStartTimerEvent(GameEvent e)
+	/*--------------------------------------------------------------------------------------*/
+	/*																						*/
+	/*	OnStartTimerEvent: Handler for OnStartTimerEvent Event								*/
+	/*			param:																		*/
+	/*				GameEvent ige - access to readonly variables in event					*/
+	/*																						*/
+	/*--------------------------------------------------------------------------------------*/
+	void OnStartTimerEvent(GameEvent ige)
 	{
 		StartCoroutine(DecrementTimer());
 	}
 
+	/*--------------------------------------------------------------------------------------*/
+	/*																						*/
+	/*	OnDestroy: This function runs when this object is destroyed		               		*/
+	/*																						*/
+	/*--------------------------------------------------------------------------------------*/
+    void OnDestroy()
+    {
+        GameEventsManager.Instance.Unregister<StartTimerEvent>(OnStartTimerEvent);
+        StopAllCoroutines();
+    }
+
+	/*--------------------------------------------------------------------------------------*/
+	/*																						*/
+	/*	AddDurationInSeconds: Adds time to the timer		            					*/
+	/*			param:																		*/
+	/*				float t - The amount of time added to the timer in seconds				*/
+	/*																						*/
+	/*--------------------------------------------------------------------------------------*/
 	public void AddDurationInSeconds(float t)
 	{
 		duration += t;
 	}
 
-	IEnumerator DecrementTimer()
+	/*--------------------------------------------------------------------------------------*/
+	/*																						*/
+	/*	DecrementTimer: Decrements timer			                                   		*/
+	/*																						*/
+	/*--------------------------------------------------------------------------------------*/
+	public IEnumerator DecrementTimer()
 	{
 		while (duration > 0)
 		{
@@ -44,6 +95,17 @@ public class Timer : MonoBehaviour
 		yield return new WaitForEndOfFrame();
 	}
 
+	/*--------------------------------------------------------------------------------------*/
+	/*																						*/
+	/*	FloatToTime: Converts a float to string formatted as a timer    					*/
+	/*			param:																		*/
+    /*				float toConvert - float to convert										*/
+    /*				string format - the selected format to output							*/
+    /*																						*/
+    /*			return:																		*/
+    /*				string (in the format of your choice)									*/
+    /*																						*/
+	/*--------------------------------------------------------------------------------------*/
 	 public string FloatToTime (float toConvert, string format)
 	 {
          switch (format)
@@ -122,10 +184,4 @@ public class Timer : MonoBehaviour
          }
          return "error";
      }
-	
-	// Update is called once per frame
-	void Update () 
-	{
-		
-	}
 }

@@ -5,25 +5,50 @@ namespace ChrsUtils
 {
 	namespace ChrsCamera
 	{
+		/*--------------------------------------------------------------------------------------*/
+		/*																						*/
+		/*	Tiling: Tiles the game on the left or right											*/
+		/*																						*/
+		/*		Functions:																		*/
+		/*			public:																		*/
+		/*																						*/
+		/*			private:																	*/
+		/*				void Awake																*/
+		/*				void Start () 															*/
+		/*				void Update ()															*/
+		/*				void MakeNewTile (int rightOfLeft)										*/
+		/*																						*/
+		/*--------------------------------------------------------------------------------------*/
 		[RequireComponent(typeof(MeshRenderer))]
-		public class Tiling : MonoBehaviour {
-
-			private float m_SpriteWidth = 0f;		// Width of element
-			private Camera m_Camera;
-			private Transform m_Transform;
-
+		public class Tiling : MonoBehaviour
+		 {
+			//	Public Variables
 			public bool hasARightTile = false;		// Used to instantiate right
 			public bool hasALeftTile = false;		// Used to instaniate left
 			public bool reverseScale = false;		// Used if object is not tilable
 			public int offsetX = 2;					// Offset so I don't any weird errors
 
+			//	Private Variables
+			private float m_SpriteWidth = 0f;		// Width of element
+			private Camera m_Camera;				//	Referemce to the camera
+			private Transform m_Transform;			//	This GameObjetc's Transform
+
+			/*--------------------------------------------------------------------------------------*/
+			/*																						*/
+			/*	Awake: Runs once at the begining of the game before Start							*/
+			/*																						*/
+			/*--------------------------------------------------------------------------------------*/
 			void Awake () 
 			{
 				m_Camera = Camera.main;
 				m_Transform = transform;
 			}
 
-			// Use this for initialization
+			/*--------------------------------------------------------------------------------------*/
+			/*																						*/
+			/*	Start: Runs once at the begining of the game. Initalizes variables.					*/
+			/*																						*/
+			/*--------------------------------------------------------------------------------------*/
 			void Start () 
 			{
 				MeshRenderer renderer = GetComponent<MeshRenderer> ();
@@ -31,7 +56,11 @@ namespace ChrsUtils
 				m_SpriteWidth = renderer.bounds.extents.x;
 			}
 			
-			// Update is called once per frame
+			/*--------------------------------------------------------------------------------------*/
+			/*																						*/
+			/*	Update: Called once per frame														*/
+			/*																						*/
+			/*--------------------------------------------------------------------------------------*/
 			void Update () 
 			{
 				// Does the sprite need a buddy. If not do nothing.
@@ -57,7 +86,13 @@ namespace ChrsUtils
 				}
 			}
 
-			// FUNC. Creates new tile on side required
+			/*--------------------------------------------------------------------------------------*/
+			/*																						*/
+			/*	MakeNewTile: Makes a new tile on the side required									*/
+			/*			param:																		*/
+			/*				int rightOfLeft - determines which side the tile goes on				*/
+			/*																						*/
+			/*--------------------------------------------------------------------------------------*/
 			void MakeNewTile (int rightOfLeft)
 			{
 				// Calculating new position for new tile

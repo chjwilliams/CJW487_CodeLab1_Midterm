@@ -41,7 +41,7 @@ namespace ChrsUtils
 			/*																						*/
 			/*	Start: Runs once at the begining of the game. Initalizes variables.					*/
 			/*																						*/
-			///*--------------------------------------------------------------------------------------*/
+			/*--------------------------------------------------------------------------------------*/
 			void Start () 
 			{
 				target = GameObject.FindGameObjectWithTag(PLAYER_TAG).transform;

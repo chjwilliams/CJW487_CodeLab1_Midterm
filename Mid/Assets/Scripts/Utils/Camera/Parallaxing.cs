@@ -5,23 +5,46 @@ namespace ChrsUtils
 {
 	namespace ChrsCamera
 	{
+		/*--------------------------------------------------------------------------------------*/
+		/*																						*/
+		/*	Parallaxing: Applies parallaxing to the background									*/
+		/*																						*/
+		/*		Functions:																		*/
+		/*			public:																		*/
+		/*																						*/
+		/*			private:																	*/
+		/*				void Awake																*/
+		/*				void Start () 															*/
+		/*				void LateUpdate ()														*/
+		/*																						*/
+		/*--------------------------------------------------------------------------------------*/
 		public class Parallaxing : MonoBehaviour 
 		{
 
+			//	Public Variables
+			public float smoothing = 1f;		//	How smooth the parallax is going to be. Set it above 0.
+			public Transform[] backgrounds; 	//	List of all the back and foregrounds to be parallaxed
+
+			//	Private Variables
 			private float[] m_ParallaxScales; 	//	Porportion of th camera's movement to move background by
 			private Transform m_cam;			//	Reference to main cmaera's trnasform
 			private Vector3 m_previousCamPos;	//	Stores camera position in previus frame
 
-			public Transform[] backgrounds; 	//	List of all the back and foregrounds to be parallaxed
-			public float smoothing = 1f;		//	How smooth the parallax is going to be. Set it above 0.
-
-			// Caled before Start()
+			/*--------------------------------------------------------------------------------------*/
+			/*																						*/
+			/*	Awake: Runs once at the begining of the game before Start							*/
+			/*																						*/
+			/*--------------------------------------------------------------------------------------*/
 			void Awake	()
 			{
 				m_cam = Camera.main.transform;
 			}
 
-			// Use this for initialization
+			/*--------------------------------------------------------------------------------------*/
+			/*																						*/
+			/*	Start: Runs once at the begining of the game. Initalizes variables.					*/
+			/*																						*/
+			/*--------------------------------------------------------------------------------------*/
 			void Start () 
 			{
 				// stores previous position
@@ -35,7 +58,11 @@ namespace ChrsUtils
 				}
 			}
 			
-			// Update is called once per frame
+			/*--------------------------------------------------------------------------------------*/
+			/*																						*/
+			/*	LateUpdate: Runs once per frame after Update 										*/
+			/*																						*/
+			/*--------------------------------------------------------------------------------------*/
 			void LateUpdate () 
 			{
 				for (int i = 0; i < backgrounds.Length; i++) 

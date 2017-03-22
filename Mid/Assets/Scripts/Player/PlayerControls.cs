@@ -11,34 +11,33 @@ using System.Collections.Generic;
 /*					private:															*/
 /*						void Start ()													*/
 /*						void Move (float dx, float dy)									*/
-/*						void Shoot ()													*/
-/*						void Update ()													*/
+/*						void ReversePolarity ()											*/
+/*						IEnumerator NormalizePolarity()									*/
+/*						void OnCollisionEnter2D(Collision2D other)						*/
+/*						void Update () 													*/
 /*																						*/
 /*--------------------------------------------------------------------------------------*/
 public class PlayerControls : MonoBehaviour 
 {
-	public const string PLAYER1 = "Player1";
-	public const string PLAYER2 = "Player2";
+	//	Public Const Variables
+	public const string PLAYER1 = "Player1";		//	Tag for player 1
+	public const string PLAYER2 = "Player2";		//	Tag for player 2
 
 	//	Public Variabels
 	public float moveSpeed = 10.0f;					//	Default movement speed of character
-	public float leftLimit = -12.4f;
-	public float rightLimit = 16.2f;
-	public float lowerLimit = -2.455001f;
-	public float upperLimit = 13.39f;
-	public KeyCode reversePolarity = KeyCode.Space;
-	public KeyCode upKey = KeyCode.W;
-	public KeyCode downKey = KeyCode.S;
-	public KeyCode leftKey = KeyCode.A;
-	public KeyCode rightKey = KeyCode.D;
+	public KeyCode reversePolarity = KeyCode.Space;	//	Key for shifting polarity
+	public KeyCode upKey = KeyCode.W;				//	Key for moving up
+	public KeyCode downKey = KeyCode.S;				//	Key for moving down
+	public KeyCode leftKey = KeyCode.A;				//	Key for moving left
+	public KeyCode rightKey = KeyCode.D;			//	Key for moving right
 
 	//	Private Variables
-	private float x = 0;
-	private float y = 0;
-	private SpriteRenderer _MyRenderer;
+	private float x = 0;							//	Float to store from Input.GetAxis
+	private float y = 0;							//	Float to store from Input.GetAxis
+	private SpriteRenderer _MyRenderer;				//	Reference to this SpriteRenderer
 	private Rigidbody2D _Rigidbody2D;				//	Reference to player's rigidbody
-	private TrailRenderer _MyTrail;
-	private Particle _ThisParticle;
+	private TrailRenderer _MyTrail;					//	Reference to TrailRenderer
+	private Particle _ThisParticle;					//	Reference to player's Particle component
 
 	/*--------------------------------------------------------------------------------------*/
 	/*																						*/
@@ -51,9 +50,6 @@ public class PlayerControls : MonoBehaviour
 		_ThisParticle = GetComponent<Particle>();
 		_MyRenderer = GetComponent<SpriteRenderer>();
 		_MyTrail = GetComponent<TrailRenderer>();
-		//_ArcTriangle = GameObject.FindGameObjectWithTag ("Reticle");
-		//_Muzzle = GameObject.FindGameObjectWithTag ("Muzzle").transform;
-		
 	}
 
 	/*--------------------------------------------------------------------------------------*/
@@ -68,33 +64,13 @@ public class PlayerControls : MonoBehaviour
 	{
 		if(Input.GetKey(key))
 		{
-			_Rigidbody2D.velocity = new Vector2(x * moveSpeed, dy * moveSpeed);
-		}
-
-		if (transform.position.x < leftLimit)
-		{
-			transform.position = new Vector3(leftLimit, transform.position.y, transform.position.z);
-		}
-
-		if (transform.position.x > rightLimit)
-		{
-			transform.position = new Vector3(rightLimit, transform.position.y, transform.position.z);
-		}
-
-		if (transform.position.y > upperLimit)
-		{
-			transform.position = new Vector3(transform.position.x, upperLimit, transform.position.z);
-		}
-
-		if (transform.position.y < lowerLimit)
-		{
-			transform.position = new Vector3(transform.position.x, lowerLimit, transform.position.z);
+			_Rigidbody2D.velocity = new Vector2(dx * moveSpeed, dy * moveSpeed);
 		}
 	}
 
 	/*--------------------------------------------------------------------------------------*/
 	/*																						*/
-	/*	ReversePolarity: Tells Basic Bullet class to get active								*/
+	/*	ReversePolarity: Pushes the moving particles away									*/
 	/*																						*/
 	/*--------------------------------------------------------------------------------------*/
 	private void ReversePolarity ()
@@ -102,6 +78,11 @@ public class PlayerControls : MonoBehaviour
 		StartCoroutine(NormalizePolarity());
 	}
 
+	/*--------------------------------------------------------------------------------------*/
+	/*																						*/
+	/*	NormalizePolarity: Returns Polarity to normal 										*/
+	/*																						*/
+	/*--------------------------------------------------------------------------------------*/
 	IEnumerator NormalizePolarity()
 	{
 		_ThisParticle.charge = _ThisParticle.charge * -1.0f;
@@ -115,13 +96,16 @@ public class PlayerControls : MonoBehaviour
 		_ThisParticle.charge = _ThisParticle.charge * -1.0f;
 	}
 
-	/// <summary>
-	/// Sent when an incoming collider makes contact with this object's
-	/// collider (2D physics only).
-	/// </summary>
-	/// <param name="other">The Collision2D data associated with this collision.</param>
+	/*--------------------------------------------------------------------------------------*/
+	/*																						*/
+	/*	OnCollisionEnter2D: Function runs when collider enter collides with anything		*/
+	/*			param:																		*/
+	/*				Collision2D other - the thing we collided with							*/
+	/*																						*/
+	/*--------------------------------------------------------------------------------------*/
 	void OnCollisionEnter2D(Collision2D other)
 	{
+		//	TODO: Can add effetcs based on collision
 		if (other.gameObject.tag == "MovingParticle")
 		{
 			
@@ -138,22 +122,20 @@ public class PlayerControls : MonoBehaviour
 		switch(gameObject.tag)
 		{
 			case PLAYER1:
-				x = Input.GetAxis ("Horizontal");
-				y = Input.GetAxis ("Vertical");
+					x = Input.GetAxis ("Horizontal");
+					y = Input.GetAxis ("Vertical");
 				break;
 			case PLAYER2:
-				x = Input.GetAxis ("Player2_Horizontal");
-				y = Input.GetAxis ("Player2_Vertical");
+					x = Input.GetAxis ("Player2_Horizontal");
+					y = Input.GetAxis ("Player2_Vertical");
 				break;
-		}		
+		}	
 
-		//	Apply the values in here.
 		Move (upKey, x, y);
 		Move (downKey, x, y);
 		Move (leftKey, x, y);
-		Move (rightKey, x ,y);
+		Move (rightKey, x ,y);	
 
-		//	If Left or Right mouse button clicked, shoot
 		if (Input.GetKeyDown(reversePolarity))
 		{
 			ReversePolarity ();

@@ -3,32 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using ChrsUtils.ChrsCamera;
 
+/*--------------------------------------------------------------------------------------*/
+/*																						*/
+/*	ShakeLevel: Shakes the level whne the player collides with the trigger area			*/
+/*																						*/
+/*		Functions:																		*/
+/*			private:																	*/
+/*				void OnTriggerEnter2D(Collider2D other)									*/
+/*																						*/
+/*--------------------------------------------------------------------------------------*/
 public class ShakeLevel : MonoBehaviour 
 {
+	//	Public const Variables
+	public const string PLAYER = "Player";				//	The player tag	
 
-	public const string PLAYER = "Player";
-	// Use this for initialization
-	void Start () 
-	{
-		
-	}
-
-	/// <summary>
-	/// Sent when another object enters a trigger collider attached to this
-	/// object (2D physics only).
-	/// </summary>
-	/// <param name="other">The other Collider2D involved in this collision.</param>
+	/*--------------------------------------------------------------------------------------*/
+	/*																						*/
+	/*	OnTriggerEnter2D: Function runs when collider enters trigger area					*/
+	/*			param:																		*/
+	/*				Collider2D other - the collider that entered the trigger area			*/
+	/*																						*/
+	/*--------------------------------------------------------------------------------------*/	
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if (other.tag.Contains(PLAYER))
 		{
 			CameraShake.CameraShakeEffect.Shake(0.1f, 0.25f);
 		}
-	}
-	
-	// Update is called once per frame
-	void Update () 
-	{
-		
 	}
 }
