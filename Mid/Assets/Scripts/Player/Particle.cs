@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,10 +15,10 @@ using UnityEngine;
 /*				void UpdateColor()														*/
 /*																						*/
 /*--------------------------------------------------------------------------------------*/
-public class Particle : MonoBehaviour 
+public class Particle : Poolable
 {
-
-	//	Public Variables
+    //	Public Variables
+    public bool reset;
 	public float charge = 1.0f;											//	This particle's charge
 	public Color nodeCharged;											//	Color of the node (Player)
 	public Color nodeDischarged = new Color (0.234f, 0.234f, 0.234f);	//	Color of the node after you reverse polarity
@@ -31,6 +32,7 @@ public class Particle : MonoBehaviour
 	/*--------------------------------------------------------------------------------------*/
 	void Start () 
 	{
+        reset = false;
 		if (tag.Contains("Player") || tag.Contains("Zone"))
 		{
 			nodeCharged = gameObject.GetComponent<SpriteRenderer>().color;
@@ -51,4 +53,38 @@ public class Particle : MonoBehaviour
 		Color color = charge > 0? positiveColor: negativeColor;
 		GetComponent<Renderer>().material.color = color;
 	}
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.tag == "ResetPosition")
+        {
+            reset = true;
+        }
+    }
+
+    public override void Setup()
+    {
+        if (tag.Contains("Player") || tag.Contains("Zone"))
+        {
+            nodeCharged = gameObject.GetComponent<SpriteRenderer>().color;
+        }
+        else
+        {
+            UpdateColor();
+        }
+    }
+
+    public override bool RePool()
+    {
+        return reset;
+    }
+
+    public override void Reset()
+    {
+        reset = false;
+        //Rigidbody rb = GetComponent<Rigidbody>(); //get the rigidBody attached to this bullet
+        transform.position = GameManager.Instance.spawnPoint.transform.position + new Vector3(0, 1, 0); //put the bullet near the player
+
+        //rb.velocity = Vector3.zero; //remove it's current velocity
+    }
 }

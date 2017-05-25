@@ -25,7 +25,11 @@ public class PlayerControls : MonoBehaviour
 
 	//	Public Variabels
 	public float moveSpeed = 10.0f;					//	Default movement speed of character
-	public KeyCode reversePolarity = KeyCode.Space;	//	Key for shifting polarity
+    public float leftLimit = -12.4f;
+    public float rightLimit = 16.2f;
+    public float lowerLimit = -2.455001f;
+	public float upperLimit = 13.39f;
+    public KeyCode reversePolarity = KeyCode.Space;	//	Key for shifting polarity
 	public KeyCode upKey = KeyCode.W;				//	Key for moving up
 	public KeyCode downKey = KeyCode.S;				//	Key for moving down
 	public KeyCode leftKey = KeyCode.A;				//	Key for moving left
@@ -65,8 +69,28 @@ public class PlayerControls : MonoBehaviour
 		if(Input.GetKey(key))
 		{
 			_Rigidbody2D.velocity = new Vector2(dx * moveSpeed, dy * moveSpeed);
-		}
-	}
+        }
+
+        if (transform.position.x < leftLimit)
+        {
+            transform.position = new Vector3(leftLimit, transform.position.y, transform.position.z);
+        }
+
+        if (transform.position.x > rightLimit)
+        {
+            transform.position = new Vector3(rightLimit, transform.position.y, transform.position.z);
+        }
+
+        if (transform.position.y > upperLimit)
+        {
+             transform.position = new Vector3(transform.position.x, upperLimit, transform.position.z);
+        }
+       
+        if (transform.position.y < lowerLimit)
+        {
+             transform.position = new Vector3(transform.position.x, lowerLimit, transform.position.z);
+        }
+    }
 
 	/*--------------------------------------------------------------------------------------*/
 	/*																						*/
@@ -85,7 +109,7 @@ public class PlayerControls : MonoBehaviour
 	/*--------------------------------------------------------------------------------------*/
 	IEnumerator NormalizePolarity()
 	{
-		_ThisParticle.charge = _ThisParticle.charge * -1.0f;
+		_ThisParticle.charge = _ThisParticle.charge * -4.0f;
 		_MyRenderer.color = _ThisParticle.nodeDischarged;
 		_MyTrail.startColor = _ThisParticle.nodeDischarged;
 		_MyTrail.endColor = _ThisParticle.nodeDischarged;
@@ -93,7 +117,7 @@ public class PlayerControls : MonoBehaviour
 		_MyRenderer.color = _ThisParticle.nodeCharged;
 		_MyTrail.startColor = _ThisParticle.nodeCharged;
 		_MyTrail.endColor = _ThisParticle.nodeCharged;
-		_ThisParticle.charge = _ThisParticle.charge * -1.0f;
+		_ThisParticle.charge = (_ThisParticle.charge/ 4.0f)* -1.0f;
 	}
 
 	/*--------------------------------------------------------------------------------------*/
@@ -119,7 +143,7 @@ public class PlayerControls : MonoBehaviour
 	/*--------------------------------------------------------------------------------------*/
 	private void Update () 
 	{
-		switch(gameObject.tag)
+		switch(gameObject.name)
 		{
 			case PLAYER1:
 					x = Input.GetAxis ("Horizontal");

@@ -25,6 +25,7 @@ using IonGameEvents;
 public class Timer : MonoBehaviour 
 {
     //  Private Variables
+    public bool tenSecondsLeft;
 	private float duration;                                 //  Current Time
 	private Text currentTime;                               //  UI reference to current timer
 	private StartTimerEvent.Handler onStartTimerEvent;      //  Handler for OnStartTimerEvent
@@ -37,9 +38,10 @@ public class Timer : MonoBehaviour
 	/*--------------------------------------------------------------------------------------*/
 	void Start () 
 	{
+        tenSecondsLeft = false;
 		currentTime = GetComponent<Text>();
 		onStartTimerEvent = new StartTimerEvent.Handler(OnStartTimerEvent);
-		GameEventsManager.Instance.Register<StartTimerEvent>(onStartTimerEvent);
+        Services.Events.Register<StartTimerEvent>(onStartTimerEvent);
 	}
 
 	/*--------------------------------------------------------------------------------------*/
@@ -61,7 +63,7 @@ public class Timer : MonoBehaviour
 	/*--------------------------------------------------------------------------------------*/
     void OnDestroy()
     {
-        GameEventsManager.Instance.Unregister<StartTimerEvent>(OnStartTimerEvent);
+        Services.Events.Unregister<StartTimerEvent>(OnStartTimerEvent);
         StopAllCoroutines();
     }
 
@@ -88,10 +90,20 @@ public class Timer : MonoBehaviour
 		{
 			yield return new WaitForSeconds(1);
 			duration--;
+            if(duration < 10 && !tenSecondsLeft)
+            {
+                tenSecondsLeft = true;
+                Services.Events.Fire(new TenSecondsLeftEvent(tenSecondsLeft));
+            }
+            if(duration > 10)
+            {
+                tenSecondsLeft = false;
+                Services.Events.Fire(new TenSecondsLeftEvent(tenSecondsLeft));
+            }
 			currentTime.text = FloatToTime(duration, "#00:00");
 		}
 
-		GameEventsManager.Instance.Fire(new TimeIsOverEvent(this));
+        Services.Events.Fire(new TimeIsOverEvent(this));
 		yield return new WaitForEndOfFrame();
 	}
 

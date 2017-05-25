@@ -25,6 +25,13 @@ using IonGameEvents;
 /*--------------------------------------------------------------------------------------*/
 public class GameManager : MonoBehaviour 
 {
+    private static GameManager _instance;
+    public static  GameManager Instance
+    {
+        get { return _instance; }
+        private set { }
+    }
+
 	//	Public Const Variable
 	public const KeyCode RESTART_GAME = KeyCode.R;					//	The button to restart the game
 
@@ -33,6 +40,9 @@ public class GameManager : MonoBehaviour
 	private const string GAME_TIMER = "Timer";						//	Name of the Timer GameObject
 	private const string PLAYER_1_SCORE = "Player1Score";			//	Name of the Text UI for player 1
 	private const string PLAYER_2_SCORE = "Player2Score";			//	Name of the Text UI for player 2
+    private const string SPAWN_POINT = "SpawnPoint";
+
+    public Transform spawnPoint;
 
 	//	Private Variables
 	private Timer gameTimer;										//	Reference to the game timer
@@ -42,7 +52,7 @@ public class GameManager : MonoBehaviour
 	private ParticleExitedZoneEvent.Handler onParticleExit;			//	Handler for OnParticleExitedZoneEvent
 	private TimeIsOverEvent.Handler onTimeIsOver;					//	Handler for TimeIsOverEvent
 
-
+    public int numberOfPlayers;
 	/*--------------------------------------------------------------------------------------*/
 	/*																						*/
 	/*	Start: Runs once at the begining of the game. Initalizes variables.					*/
@@ -50,26 +60,34 @@ public class GameManager : MonoBehaviour
 	/*--------------------------------------------------------------------------------------*/
 	void Start () 
 	{
+        numberOfPlayers = GameObject.FindGameObjectsWithTag("Player").Length;
+        if (_instance == null)
+        {
+            _instance = this;
+        }
+
 		gameTimer = GameObject.Find(GAME_TIMER).GetComponent<Timer>();
 
 		player1Score = GameObject.Find(PLAYER_1_SCORE).GetComponent<Text>();
 		player2Score = GameObject.Find(PLAYER_2_SCORE).GetComponent<Text>();
 
+        spawnPoint = GameObject.Find(SPAWN_POINT).transform;
+
 		//	Sets up the handlers
 		onParticleEnter = new ParticleEnteredZoneEvent.Handler(OnParticleEnter);
 		onParticleExit = new ParticleEnteredZoneEvent.Handler(OnParticleExit);
 		onTimeIsOver = new TimeIsOverEvent.Handler(OnTimeIsOver);
-		
-		//	Registers for events
-		GameEventsManager.Instance.Register<ParticleEnteredZoneEvent>(onParticleEnter);
-		GameEventsManager.Instance.Register<ParticleExitedZoneEvent>(onParticleExit);
-		GameEventsManager.Instance.Register<TimeIsOverEvent>(onTimeIsOver);
+
+        //	Registers for events
+        Services.Events.Register<ParticleEnteredZoneEvent>(onParticleEnter);
+        Services.Events.Register<ParticleExitedZoneEvent>(onParticleExit);
+        Services.Events.Register<TimeIsOverEvent>(onTimeIsOver);
 
 		//	Adds time to Timer
 		gameTimer.AddDurationInSeconds(61);
 
-		//	Fires StartTimerEvent
-		GameEventsManager.Instance.Fire(new StartTimerEvent());
+        //	Fires StartTimerEvent
+        Services.Events.Fire(new StartTimerEvent());
 	}
 
 	/*--------------------------------------------------------------------------------------*/
@@ -140,9 +158,9 @@ public class GameManager : MonoBehaviour
 	/*--------------------------------------------------------------------------------------*/
 	void RestartGame()
 	{
-		GameEventsManager.Instance.Unregister<ParticleEnteredZoneEvent>(onParticleEnter);
-		GameEventsManager.Instance.Unregister<ParticleExitedZoneEvent>(onParticleExit);
-		SceneManager.LoadScene(MAIN_SCENE, LoadSceneMode.Single);
+        Services.Events.Unregister<ParticleEnteredZoneEvent>(onParticleEnter);
+        Services.Events.Unregister<ParticleExitedZoneEvent>(onParticleExit);
+		//SceneManager.LoadScene(MAIN_SCENE, LoadSceneMode.Single);
 	}
 
 	/*--------------------------------------------------------------------------------------*/
@@ -156,5 +174,11 @@ public class GameManager : MonoBehaviour
 		{	
 			RestartGame();
 		}
+
+        numberOfPlayers = GameObject.FindGameObjectsWithTag("Player").Length;
+        if (numberOfPlayers < 2)
+        {
+            GameObject player = ObjectPool.GetFromPool(Poolable.types.PLAYER);
+        }
 	}
 }

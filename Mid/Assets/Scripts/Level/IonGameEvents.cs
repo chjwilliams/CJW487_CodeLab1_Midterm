@@ -27,13 +27,19 @@ namespace IonGameEvents
 
 	public class StartTimerEvent : GameEvent
 	{
-		public StartTimerEvent ()
-		{
-			
-		}
+		public StartTimerEvent () {	}
 	}
 
-	public class TimeIsOverEvent : GameEvent
+    public class TenSecondsLeftEvent : GameEvent
+    {
+        public readonly bool tenSecondsLeft;
+        public TenSecondsLeftEvent(bool _tenSecondsLeft)
+        {
+            tenSecondsLeft = _tenSecondsLeft;
+        }
+    }
+
+    public class TimeIsOverEvent : GameEvent
 	{
 		public readonly Timer timer;
 

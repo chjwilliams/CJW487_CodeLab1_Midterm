@@ -42,7 +42,7 @@ public class ZoneManager : MonoBehaviour
 	{
 		if (other.tag.Contains(PARTICLE))
 		{
-			GameEventsManager.Instance.Fire(new ParticleEnteredZoneEvent(this));
+            Services.Events.Fire(new ParticleEnteredZoneEvent(this));
 		}
 	}
 
@@ -57,7 +57,7 @@ public class ZoneManager : MonoBehaviour
 	{
 		if (other.tag.Contains(PARTICLE))
 		{
-			GameEventsManager.Instance.Fire(new ParticleExitedZoneEvent(this));
+            Services.Events.Fire(new ParticleExitedZoneEvent(this));
 		}
 	}
 }

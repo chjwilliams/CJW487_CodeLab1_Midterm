@@ -18,6 +18,7 @@ using UnityEngine;
 public class ParticleManager : MonoBehaviour 
 {
 	public float cycleInterval = 0.007f;					//	Increase to make force greater because it cycles more often
+    public float maxForce = 10.0f;
 
 	private List<Particle> particles;						//	List of all particles
 	private List<MovingParticle> movingParticles;			//	List of all moving particles
@@ -78,8 +79,10 @@ public class ParticleManager : MonoBehaviour
 				newFocrce = Vector3.zero;
 			}
 
-			//	Applies force to the Rigidbody2D
-			particle.myRigidbody.AddForce(newFocrce);
+            Vector3 addedForce = Vector3.ClampMagnitude(newFocrce, maxForce);
+
+            //	Applies force to the Rigidbody2D
+            particle.myRigidbody.AddForce(addedForce);
 		}
 	}
 
