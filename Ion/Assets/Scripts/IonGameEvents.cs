@@ -25,7 +25,27 @@ namespace IonGameEvents
 		}
 	}
 
-	public class StartTimerEvent : GameEvent
+    public class PlayerCollidedEvent : GameEvent
+    {
+        public readonly string player;
+        public PlayerCollidedEvent(string _player)
+        {
+            player = _player;
+        }
+    }
+
+    public class PlayerShiftEvent : GameEvent
+    {
+        public readonly string player;
+        public readonly bool currentlyReversed;
+        public PlayerShiftEvent(string _player, bool _currentlyReversed)
+        {
+            player = _player;
+            currentlyReversed = _currentlyReversed;
+        }
+    }
+
+    public class StartTimerEvent : GameEvent
 	{
 		public StartTimerEvent () {	}
 	}

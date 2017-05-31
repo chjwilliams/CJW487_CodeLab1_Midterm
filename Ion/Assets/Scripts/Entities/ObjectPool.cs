@@ -55,7 +55,7 @@ public class ObjectPool : MonoBehaviour
         else if (p is Particle)
         { //if p is a "PoolableEnemy"
             Debug.Log("Queue the player");
-            playerPool.Enqueue(obj); //put it in the enemy pool
+            //playerPool.Enqueue(obj); //put it in the enemy pool
         }
         else
         { //if it's an unsupported type of Poolable

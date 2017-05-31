@@ -26,6 +26,7 @@ public class Timer : MonoBehaviour
 {
     //  Private Variables
     public bool tenSecondsLeft;
+    [SerializeField]
 	private float duration;                                 //  Current Time
 	private Text currentTime;                               //  UI reference to current timer
 	private StartTimerEvent.Handler onStartTimerEvent;      //  Handler for OnStartTimerEvent
@@ -33,10 +34,10 @@ public class Timer : MonoBehaviour
 
 	/*--------------------------------------------------------------------------------------*/
 	/*																						*/
-	/*	Start: Runs once at the begining of the game. Initalizes variables.					*/
+	/*	Awake: Runs once at the begining of the gamen before Start. Initalizes variables.	*/
 	/*																						*/
 	/*--------------------------------------------------------------------------------------*/
-	void Start () 
+	void Awake () 
 	{
         tenSecondsLeft = false;
 		currentTime = GetComponent<Text>();

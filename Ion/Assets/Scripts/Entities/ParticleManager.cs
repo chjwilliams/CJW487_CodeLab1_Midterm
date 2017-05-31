@@ -22,16 +22,22 @@ public class ParticleManager : MonoBehaviour
 
 	private List<Particle> particles;						//	List of all particles
 	private List<MovingParticle> movingParticles;			//	List of all moving particles
+    [SerializeField]
+    private int numberOfBlues;
+    [SerializeField]
+    private int currentNumberOfBlues;
 
-	/*--------------------------------------------------------------------------------------*/
-	/*																						*/
-	/*	Start: Runs once at the begining of the game. Initalizes variables.					*/
-	/*																						*/
-	/*--------------------------------------------------------------------------------------*/
-	void Start () 
+    /*--------------------------------------------------------------------------------------*/
+    /*																						*/
+    /*	Start: Runs once at the begining of the game. Initalizes variables.					*/
+    /*																						*/
+    /*--------------------------------------------------------------------------------------*/
+    void Start () 
 	{
 		particles = new List<Particle>(FindObjectsOfType<Particle>());
 		movingParticles = new List<MovingParticle>(FindObjectsOfType<MovingParticle>());
+
+        numberOfBlues = movingParticles.Count;
 
 		foreach(MovingParticle particle in movingParticles)
 		{
@@ -112,4 +118,13 @@ public class ParticleManager : MonoBehaviour
 			yield return new WaitForSeconds(cycleInterval);
 		}
 	}
+
+    private void Update()
+    {
+        
+        if(ObjectPool.bluePool.Count > 0)
+        {
+            ObjectPool.GetFromPool(Poolable.types.BLUE);
+        }
+    }
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
 
 /*--------------------------------------------------------------------------------------*/
 /*																						*/
@@ -56,7 +54,7 @@ public class Particle : Poolable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "ResetPosition")
+        if(collision.tag == "ResetPosition" && tag != "Player")
         {
             reset = true;
         }
@@ -83,7 +81,7 @@ public class Particle : Poolable
     {
         reset = false;
         //Rigidbody rb = GetComponent<Rigidbody>(); //get the rigidBody attached to this bullet
-        transform.position = GameManager.Instance.spawnPoint.transform.position + new Vector3(0, 1, 0); //put the bullet near the player
+        transform.position = GameSceneScript.spawnPoint.transform.position + new Vector3(0, 1, 0); //put the bullet near the player
 
         //rb.velocity = Vector3.zero; //remove it's current velocity
     }

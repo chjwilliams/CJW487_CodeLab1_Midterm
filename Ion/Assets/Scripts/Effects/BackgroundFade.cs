@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using IonGameEvents;
-using ChrsUtils.ChrsEventSystem.EventsManager;
 using ChrsUtils.ChrsEventSystem.GameEvents;
 
 public class BackgroundFade : MonoBehaviour
@@ -17,7 +14,7 @@ public class BackgroundFade : MonoBehaviour
 
         onTenSecondsLeft = new TenSecondsLeftEvent.Handler(OnTenSecondsLeft);
 
-        GameEventsManager.Instance.Register<TenSecondsLeftEvent>(onTenSecondsLeft);
+        Services.Events.Register<TenSecondsLeftEvent>(onTenSecondsLeft);
 	}
 
     private void OnTenSecondsLeft(GameEvent e)

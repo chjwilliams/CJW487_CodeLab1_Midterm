@@ -1,13 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using ChrsUtils.ChrsCamera;
-using ChrsUtils.ChrsEventSystem.EventsManager;
+﻿using UnityEngine;
 using ChrsUtils.ChrsEventSystem.GameEvents;
 using IonGameEvents;
 
+
+//  TODO: show winner at end
 /*--------------------------------------------------------------------------------------*/
 /*																						*/
 /*	GameManager: Updates Score and resets game											*/
@@ -33,26 +29,22 @@ public class GameManager : MonoBehaviour
     }
 
 	//	Public Const Variable
-	public const KeyCode RESTART_GAME = KeyCode.R;					//	The button to restart the game
+	public const KeyCode RESTART_GAME = KeyCode.Backspace;					//	The button to restart the game
+    public string sceneName;
+    public string winner;
 
-	//	Private Const Variables
-	private const string MAIN_SCENE = "Main";						//	Name of the main scene
-	private const string GAME_TIMER = "Timer";						//	Name of the Timer GameObject
-	private const string PLAYER_1_SCORE = "Player1Score";			//	Name of the Text UI for player 1
-	private const string PLAYER_2_SCORE = "Player2Score";			//	Name of the Text UI for player 2
-    private const string SPAWN_POINT = "SpawnPoint";
+    [SerializeField]
+    private float player1Score;
+    [SerializeField]
+    private float player2Score;
 
-    public Transform spawnPoint;
+    private GameObject _Main;
 
-	//	Private Variables
-	private Timer gameTimer;										//	Reference to the game timer
-	private Text player1Score;										//	Reference to player 1's score
-	private Text player2Score;										//	Reference to player 2's score
 	private ParticleEnteredZoneEvent.Handler onParticleEnter;		//	Handler for OnParticleEnteredZoneEvent
 	private ParticleExitedZoneEvent.Handler onParticleExit;			//	Handler for OnParticleExitedZoneEvent
-	private TimeIsOverEvent.Handler onTimeIsOver;					//	Handler for TimeIsOverEvent
+    private StartTimerEvent.Handler onStartTimerEvent;              //  Handler for OnStartTimerEvent
+    private TimeIsOverEvent.Handler onTimeIsOver;					//	Handler for TimeIsOverEvent
 
-    public int numberOfPlayers;
 	/*--------------------------------------------------------------------------------------*/
 	/*																						*/
 	/*	Start: Runs once at the begining of the game. Initalizes variables.					*/
@@ -60,34 +52,22 @@ public class GameManager : MonoBehaviour
 	/*--------------------------------------------------------------------------------------*/
 	void Start () 
 	{
-        numberOfPlayers = GameObject.FindGameObjectsWithTag("Player").Length;
         if (_instance == null)
         {
             _instance = this;
         }
 
-		gameTimer = GameObject.Find(GAME_TIMER).GetComponent<Timer>();
-
-		player1Score = GameObject.Find(PLAYER_1_SCORE).GetComponent<Text>();
-		player2Score = GameObject.Find(PLAYER_2_SCORE).GetComponent<Text>();
-
-        spawnPoint = GameObject.Find(SPAWN_POINT).transform;
-
 		//	Sets up the handlers
 		onParticleEnter = new ParticleEnteredZoneEvent.Handler(OnParticleEnter);
 		onParticleExit = new ParticleEnteredZoneEvent.Handler(OnParticleExit);
-		onTimeIsOver = new TimeIsOverEvent.Handler(OnTimeIsOver);
+        onStartTimerEvent = new StartTimerEvent.Handler(OnStartTimerEvent);
+        onTimeIsOver = new TimeIsOverEvent.Handler(OnTimeIsOver);
 
         //	Registers for events
-        Services.Events.Register<ParticleEnteredZoneEvent>(onParticleEnter);
-        Services.Events.Register<ParticleExitedZoneEvent>(onParticleExit);
+        Services.Events.Register<StartTimerEvent>(onStartTimerEvent);
         Services.Events.Register<TimeIsOverEvent>(onTimeIsOver);
 
-		//	Adds time to Timer
-		gameTimer.AddDurationInSeconds(61);
-
-        //	Fires StartTimerEvent
-        Services.Events.Fire(new StartTimerEvent());
+        _Main = GameObject.Find("Main");
 	}
 
 	/*--------------------------------------------------------------------------------------*/
@@ -118,17 +98,33 @@ public class GameManager : MonoBehaviour
 		UpdateScore(((ParticleExitedZoneEvent)ige).zone.tag, ((ParticleExitedZoneEvent)ige).zone.score);
 	}
 
-	/*--------------------------------------------------------------------------------------*/
-	/*																						*/
-	/*	OnTimeIsOver: Handler for OnTimeIsOver Event										*/
-	/*			param:																		*/
-	/*				GameEvent ige - access to readonly variables in event					*/
-	/*																						*/
-	/*--------------------------------------------------------------------------------------*/	
-	void OnTimeIsOver(GameEvent ige)
+    /*--------------------------------------------------------------------------------------*/
+    /*																						*/
+    /*	OnStartTimerEvent: Handler for OnStartTimerEvent Event								*/
+    /*			param:																		*/
+    /*				GameEvent ige - access to readonly variables in event					*/
+    /*																						*/
+    /*--------------------------------------------------------------------------------------*/
+    void OnStartTimerEvent(GameEvent ige)
+    {
+        Services.Events.Register<ParticleEnteredZoneEvent>(onParticleEnter);
+        Services.Events.Register<ParticleExitedZoneEvent>(onParticleExit);
+    }
+
+    /*--------------------------------------------------------------------------------------*/
+    /*																						*/
+    /*	OnTimeIsOver: Handler for OnTimeIsOver Event										*/
+    /*			param:																		*/
+    /*				GameEvent ige - access to readonly variables in event					*/
+    /*																						*/
+    /*--------------------------------------------------------------------------------------*/
+    void OnTimeIsOver(GameEvent ige)
 	{
-		//	Pauses the game
-		Time.timeScale = 0.0f;
+        //	Pauses the game
+        Services.Events.Unregister<ParticleEnteredZoneEvent>(onParticleEnter);
+        Services.Events.Unregister<ParticleExitedZoneEvent>(onParticleExit);
+        Services.Events.Fire(new TenSecondsLeftEvent(false));
+        Services.Scenes.Swap<ResultsSceneScript>();
 	}
 
 	/*--------------------------------------------------------------------------------------*/
@@ -143,13 +139,28 @@ public class GameManager : MonoBehaviour
 	{
 		if(tag.Contains("1"))
 		{
-			player1Score.text = score.ToString();
+			GameSceneScript.player1Score.text = score.ToString();
 		}
 		else if (tag.Contains("2"))
 		{
-			player2Score.text = score.ToString();
+            GameSceneScript.player2Score.text = score.ToString();
 		}
-	}
+
+        player1Score = float.Parse(GameSceneScript.player1Score.text);
+        player2Score = float.Parse(GameSceneScript.player2Score.text);
+        if (player1Score > player2Score)
+        {
+            winner = "ORANGE WINS";
+        }
+        else if (player1Score < player2Score)
+        {
+            winner = "PINK WINS";
+        }
+        else
+        {
+            winner = "TIE GAME";
+        }
+    }
 	
 	/*--------------------------------------------------------------------------------------*/
 	/*																						*/
@@ -160,7 +171,7 @@ public class GameManager : MonoBehaviour
 	{
         Services.Events.Unregister<ParticleEnteredZoneEvent>(onParticleEnter);
         Services.Events.Unregister<ParticleExitedZoneEvent>(onParticleExit);
-		//SceneManager.LoadScene(MAIN_SCENE, LoadSceneMode.Single);
+        Services.Scenes.Swap<TitleSceneScript>();
 	}
 
 	/*--------------------------------------------------------------------------------------*/
@@ -170,15 +181,16 @@ public class GameManager : MonoBehaviour
 	/*--------------------------------------------------------------------------------------*/
 	void Update () 
 	{
+        sceneName = _Main.transform.GetChild(0).tag;
+
+        if(sceneName == "Title")
+        {
+            winner = "";
+        }
+
 		if(Input.GetKeyDown(RESTART_GAME))
 		{	
 			RestartGame();
 		}
-
-        numberOfPlayers = GameObject.FindGameObjectsWithTag("Player").Length;
-        if (numberOfPlayers < 2)
-        {
-            GameObject player = ObjectPool.GetFromPool(Poolable.types.PLAYER);
-        }
 	}
 }
